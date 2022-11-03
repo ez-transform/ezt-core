@@ -1,0 +1,6 @@
+name: '{project_name}'
+
+models:
+  main_folder: models
+
+logs_destination: ./.logs

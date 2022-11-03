@@ -1,0 +1,43 @@
+site_name: ezt-docs
+site_description: Documentation for Ez-transform (Ezt) - Analytics engineering for data lakes.
+
+nav:
+  - Home: index.md
+  - Guides:
+    - Installation: pages/guides/installation.md
+    - Project initiation: pages/guides/project_initiation.md
+    - Registering a source: pages/guides/register_source.md
+    - Creating a model: pages/guides/model_creation.md
+    - Running models: pages/guides/run_models.md
+  - Reference:
+    - CLI: pages/reference/cli_ref.md
+    - Sources: pages/reference/sources.md
+    - Models: pages/reference/models.md
+  - FAQ: pages/faq.md
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: red
+  logo: img/squirrel.svg
+  favicon: img/squirrel.svg
+  features:
+    - content.code.annotate
+  
+  features:
+    - navigation.tabs
+    - navigation.sections
+
+
+markdown_extensions:
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+

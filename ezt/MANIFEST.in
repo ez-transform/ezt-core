@@ -1,0 +1,1 @@
+recursive-include ezt/include *.sql *.yml *.md *.whl"

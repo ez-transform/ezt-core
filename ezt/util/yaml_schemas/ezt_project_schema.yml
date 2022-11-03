@@ -1,0 +1,12 @@
+type: object
+properties:
+  name:
+    type: string
+  models:
+    type: object
+    properties:
+      folder:
+        type: string
+required:
+  - name
+  - models

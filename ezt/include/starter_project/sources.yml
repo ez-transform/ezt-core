@@ -1,0 +1,10 @@
+
+sources:
+  - name: my_source
+    filesystem: local
+    path: <path>
+    path_type: file
+    filename: <filename>
+    format: <parquet>
+
+

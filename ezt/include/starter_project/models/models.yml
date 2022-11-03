@@ -1,0 +1,10 @@
+
+
+models:
+  - name: my_example
+    type: df
+    destination: ./.target
+    filesystem: local
+    write_settings:
+      file_type: parquet
+      mode: overwrite

@@ -1,0 +1,11 @@
+__pycache__
+__pycache__/*
+
+# environment variables
+.env
+
+# models
+.target
+
+# logs
+.logs
