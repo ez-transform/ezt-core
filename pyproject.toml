@@ -23,7 +23,7 @@ jsonschema = "^4.14.0"
 pyarrow = "^9.0.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^6.0"
 flake8 = "^4.0.1"
 black = "^22.3.0"
 isort = "^5.10.1"
