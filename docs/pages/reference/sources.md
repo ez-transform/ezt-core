@@ -8,7 +8,7 @@ So far, only yml-files are supported as configuration for source files and other
 
 ## :material-format-columns: Layout
 
-The source file has one base key `sources:` and under that all of the sources are then gathered as a list. A typical layout with two sources would look something like this:
+The source file has one base key `sources` and under that all of the sources are then gathered as a list. A typical layout with two sources would look something like this:
 
 ``` { .yaml title="sources.yml" .annotate }
 sources: #(1)
@@ -19,11 +19,11 @@ sources: #(1)
     path: /home/SomeUser/data/usa_cars.parquet
     
 
-  - name: rodent_inspections
+  - name: car_sales
     filesystem: s3
     path_type: folder
     bucket: my-ezt-bucket
-    folder: my-folder/my-table
+    folder: my-folder/car_sales
     csv_properties:
       infer_schema_length: 1000
 ```
