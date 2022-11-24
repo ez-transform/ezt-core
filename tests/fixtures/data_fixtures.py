@@ -3,6 +3,7 @@ import os
 import deltalake as dl
 import polars as pl
 import pyarrow as pa
+import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 import pytest
 
@@ -80,10 +81,20 @@ def pyarrow_table_large_types():
 
 @pytest.fixture
 def pyarrow_dataset(tmp_path, pyarrow_table):
-    """Returns a pyarrow dataset"""
+    """Returns a pyarrow ParquetDataset"""
     temp_dest = tmp_path / "some_parquet_file.parquet"
     pq.write_table(pyarrow_table, temp_dest)
     dataset = pq.ParquetDataset(temp_dest)
+
+    return dataset
+
+
+@pytest.fixture
+def arrow_dataset(tmp_path, pyarrow_table):
+    """Returns a pyarrow Dataset"""
+    temp_dest = tmp_path / "some_parquet_file.parquet"
+    pq.write_table(pyarrow_table, temp_dest)
+    dataset = ds.dataset(temp_dest, format="parquet")
 
     return dataset
 

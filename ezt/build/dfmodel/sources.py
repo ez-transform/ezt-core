@@ -4,6 +4,7 @@ import polars as pl
 
 # import pyarrow.dataset as
 import pyarrow.parquet as pq
+import pyarrow.dataset as ds
 from ezt.util.config import Config
 from ezt.util.exceptions import EztConfigException
 from ezt.util.helpers import get_s3_filesystem
@@ -47,29 +48,28 @@ def _get_s3_parq_source(source):
     # set up s3 filesystem keys
     s3 = get_s3_filesystem()
 
-    if "folder" in source.keys():
-        folder = source["folder"]
+    # removes leading and ending forwardslashes
+    path = source["path"]
+    if path.endswith("/"):
+        path = path[:-1]
 
-        # removes leading and ending forwardslashes
-        if folder.endswith("/"):
-            folder = folder[:-1]
-        if folder.startswith("/"):
-            folder = folder[1:]
+    if path.startswith("/"):
+        path = path[1:]
+    elif path.startswith("s3://"):
+        path = path[5:]
 
-        if source["path_type"] == "folder":
-            target_path = f's3://{source["bucket"]}/{folder}/'
-            dataset = pq.ParquetDataset(target_path, use_legacy_dataset=False)
-            table = dataset.read()
-        elif source["path_type"] == "file":
-            target_path = f'{source["bucket"]}/{folder}/{source["filename"]}'
-            table = pq.read_table(target_path, filesystem=s3)
-        else:
-            raise EztConfigException("Model parameter path_type not provided.")
+    if source["path_type"] == "folder":
+        target_path = f"s3://{path}/"
+        dset = ds.dataset(target_path, format="parquet")
+        table = pl.scan_ds(dset)
+    elif source["path_type"] == "file":
+        target_path = f"{path}"
+        pa_table = pq.read_table(target_path, filesystem=s3)
+        table = pl.from_arrow(pa_table).lazy()
     else:
-        target_path = f'{source["bucket"]}/{source["filename"]}'
-        table = pq.read_table(target_path, filesystem=s3)
+        raise EztConfigException("Invalid or missing value for key 'path_type' in sources.yml.")
 
-    return pl.from_arrow(table).lazy()
+    return table
 
 
 def _get_csv_local_source(source_dict):

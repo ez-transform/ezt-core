@@ -13,66 +13,13 @@ properties:
           enum: [file, folder]
         format:
           enum: [csv, parquet]
+        path:
+          type: string
       required:
         - name
         - filesystem
         - path_type
         - format
-      allOf:
-          - if:
-              properties:
-                filesystem:
-                  const: local
-              required:
-                - filesystem
-            then:
-              properties:
-                path:
-                  type: string
-              required:
-                - path
-          - if:
-              properties:
-                filesystem:
-                  const: s3
-                path_type:
-                  const: file
-              required:
-                - filesystem
-                - path_type
-            then:
-              properties:
-                bucket:
-                  type: string
-                filename:
-                  type: string
-              required:
-                - bucket
-                - filename
-          - if:
-              properties:
-                filesystem:
-                  const: s3
-                path_type:
-                  const: folder
-              required:
-                - filesystem
-                - path_type
-            then:
-              properties:
-                bucket:
-                  type: string
-                folder:
-                  type: string
-              required:
-                - bucket
-                - folder
+        - path
 required:
   - sources
-
-
-
-
-
-
-
