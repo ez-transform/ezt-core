@@ -1,9 +1,12 @@
 import types
 
-import ezt.build.dfmodel.models
 import polars as pl
+import pyarrow.dataset as ds
 import pyarrow.parquet as pq
 import pytest
+from s3fs import S3FileSystem
+
+import ezt.build.dfmodel.models
 from ezt.build.dfmodel.sources import (
     _get_csv_local_source,
     _get_parq_local_source,
@@ -13,7 +16,6 @@ from ezt.build.dfmodel.sources import (
     _get_source_getter_func,
     get_source,
 )
-from s3fs import S3FileSystem
 from tests.fixtures.yml_fixtures import source_dict_local_parq
 
 
@@ -68,15 +70,15 @@ def test_get_source_getter(
     assert s3_csv_getter.__name__ == "_get_s3_csv_source"
 
 
-def test_get_s3_parq_source_folder(monkeypatch, pyarrow_dataset, source_dict_s3_parq_folder):
+def test_get_s3_parq_source_folder(monkeypatch, arrow_dataset, source_dict_s3_parq_folder):
 
     s3 = S3FileSystem()
 
-    def mock_ParquetDataset_func(path_or_paths=None, use_legacy_dataset=None):
-        return pyarrow_dataset
+    def mock_ParquetDataset_func(path_or_paths=None, use_legacy_dataset=None, format=None):
+        return arrow_dataset
 
     monkeypatch.setattr(ezt.util.helpers, "get_s3_filesystem", s3)
-    monkeypatch.setattr(pq, "ParquetDataset", mock_ParquetDataset_func)
+    monkeypatch.setattr(ds, "dataset", mock_ParquetDataset_func)
 
     model = _get_s3_parq_source(source_dict_s3_parq_folder)
     model_df = model.collect()
@@ -118,7 +120,7 @@ def test_get_s3_parq_source_no_folder(monkeypatch, pyarrow_table, source_dict_s3
 
     s3 = S3FileSystem()
 
-    del source_dict_s3_parq_file["folder"]
+    # del source_dict_s3_parq_file["folder"]
 
     def mock_pq_read_table_func(source=None, filesystem=None):
         return pyarrow_table

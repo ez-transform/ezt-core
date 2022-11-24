@@ -99,8 +99,7 @@ def source_dict_s3_parq_folder():
         "filesystem": "s3",
         "path_type": "folder",
         "format": "parquet",
-        "bucket": "some_bucket",
-        "folder": "/some_folder/",
+        "path": "some_bucket/some_folder",
     }
     return source_dict
 
@@ -113,9 +112,7 @@ def source_dict_s3_parq_file():
         "filesystem": "s3",
         "path_type": "file",
         "format": "parquet",
-        "bucket": "some_bucket",
-        "folder": "/some_folder/",
-        "filename": "my_source.parquet",
+        "path": "some_bucket/some_folder/my_source.parquet",
     }
     return source_dict
 
@@ -128,8 +125,7 @@ def source_dict_s3_delta():
         "filesystem": "s3",
         "path_type": "folder",
         "format": "delta",
-        "bucket": "some_bucket",
-        "folder": "some_folder",
+        "path": "some_bucket/some_folder",
     }
     return source_dict
 
