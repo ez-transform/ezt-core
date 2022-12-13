@@ -8,6 +8,7 @@ nav:
     - Project initiation: pages/guides/project_initiation.md
     - Registering a source: pages/guides/register_source.md
     - Creating a model: pages/guides/model_creation.md
+    - Structuring your project: pages/guides/project_structure.md
     - Running models: pages/guides/run_models.md
   - Reference:
     - CLI: pages/reference/cli_ref.md
@@ -40,4 +41,8 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - mkdocs-click
+  - md_in_html
+  - admonition
+  - pymdownx.details
 
