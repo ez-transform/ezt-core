@@ -2,17 +2,17 @@
 
 ## Requirements
 
-In order to use ezt the following is required:
+In order to use Ezt the following is required:
 
 * Python 3.7 or newer
 
 ## Linux
 
-You can install ezt with pip simply by writing:
+You can install Ezt with pip simply by writing:
 
     pip install ez-transform
 
-We recommend installing ezt in a python virtual environment.
+We recommend installing Ezt in a python virtual environment.
 
 ## MacOS
 

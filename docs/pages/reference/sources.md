@@ -22,10 +22,8 @@ sources: #(1)
   - name: car_sales
     filesystem: s3
     path_type: folder
-    bucket: my-ezt-bucket
-    folder: my-folder/car_sales
-    csv_properties:
-      infer_schema_length: 1000
+    format: parquet
+    path: my-bucket/car_sales
 ```
 
 1. This key is **required** and the value of it is always a list.
