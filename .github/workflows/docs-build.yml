@@ -36,7 +36,7 @@ jobs:
           key: pydeps-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install docs dependencies
-        run: poetry install --no-interaction --only docs
+        run: poetry install --no-interaction --with docs
 
       - name: Build documentation
         run: poetry run mkdocs gh-deploy --force --clean --verbose
