@@ -1,4 +1,4 @@
-# Welcome to ezt-docs
+# Welcome to the documention for Ezt
 
 :octicons-squirrel-16: ez-transform (Ezt) - Analytics engineering for data lakes.
 
