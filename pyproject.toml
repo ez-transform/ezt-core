@@ -1,8 +1,11 @@
 [tool.poetry]
-name = "ezt"
+name = "ezt-core"
 version = "0.1.0"
 description = ""
 authors = ["John Kaustinen <jokausti@gmail.com>"]
+packages = [
+    {include = "ezt"}
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
