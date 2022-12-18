@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ezt-core"
+name = "ez-transform"
 version = "0.1.0"
 description = ""
 authors = ["John Kaustinen <jokausti@gmail.com>"]
