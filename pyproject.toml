@@ -3,6 +3,9 @@ name = "ez-transform"
 version = "0.1.0"
 description = "Analytics engineering for data lakes."
 authors = ["John Kaustinen <jokausti@gmail.com>"]
+license = 'Apache-2.0'
+documentation = 'https://ez-transform.github.io/ezt-core/'
+repository = 'https://github.com/ez-transform/ezt-core'
 packages = [
     {include = "ezt"}
 ]
