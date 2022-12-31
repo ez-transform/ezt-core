@@ -6,6 +6,7 @@ authors = ["John Kaustinen <jokausti@gmail.com>"]
 license = 'Apache-2.0'
 documentation = 'https://ez-transform.github.io/ezt-core/'
 repository = 'https://github.com/ez-transform/ezt-core'
+readme = 'README.md'
 packages = [
     {include = "ezt"}
 ]
