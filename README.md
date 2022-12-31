@@ -36,3 +36,5 @@ $ ezt init myproject && cd myproject
 
 Now you have created a project and can use your IDE of choice to start
 developing your data models. 🥳
+
+Check out the documentation at <https://ez-transform.github.io/ezt-core/> to learn more about how to develop data models with Ezt.
