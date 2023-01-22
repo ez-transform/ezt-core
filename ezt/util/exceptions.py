@@ -4,6 +4,17 @@ class EztException(Exception):
     pass
 
 
+class ConfigInitException(EztException):
+    """
+    Exception representing running an ezt-command from a folder not containing
+    an ezt_project.yml file.
+    """
+
+    def __init__(self, message="Config file ezt_project.yml not found."):
+        self.message = message
+        super().__init__(self.message)
+
+
 class PyModelException(EztException):
     """
     Exception representing an invalid df model.
