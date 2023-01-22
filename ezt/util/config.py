@@ -5,16 +5,17 @@ import os
 from importlib.util import module_from_spec, spec_from_file_location
 from typing import Union
 
+# from matplotlib import pyplot as plt
+from yaml import parse
+
 from ezt.util.exceptions import (
+    ConfigInitException,
     EztConfigException,
     GetModelException,
     GetSourceException,
 )
 from ezt.util.helpers import get_model_dependencies, parse_yaml
 from ezt.util.validator import Validator
-
-# from matplotlib import pyplot as plt
-from yaml import parse
 
 
 def unwrap(func):
@@ -30,7 +31,11 @@ class Config:
     @property
     def project(self) -> dict:
         """Returns the project yaml as a python dict."""
-        return parse_yaml(f"{self.project_dir}/ezt_project.yml")
+
+        try:
+            return parse_yaml(f"{self.project_dir}/ezt_project.yml")
+        except FileNotFoundError:
+            raise ConfigInitException
 
     @property
     def sources(self) -> Union[dict, str]:
