@@ -4,7 +4,7 @@ import deltalake as dl
 import polars as pl
 import pyarrow.parquet as pq
 from ezt.util.config import Config
-from ezt.util.helpers import get_s3_filesystem
+from ezt.util.helpers import get_s3_filesystem, prepare_s3_path
 
 
 def get_model(name: str) -> pl.LazyFrame:
@@ -42,7 +42,12 @@ def _get_local_delta_model(model):
 
 def _get_s3_delta_model(model):
 
-    raise NotImplementedError("Delta models are not supported for s3 yet.")
+    table_path = prepare_s3_path(model["destination"])
+
+    result_lazy = pl.from_arrow(
+        dl.DeltaTable(table_uri=f'{table_path}/{model["name"]}').to_pyarrow_table()
+    ).lazy()
+    return result_lazy
 
 
 def _get_s3_parq_model(model):
