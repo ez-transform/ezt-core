@@ -39,7 +39,7 @@ models:
 
 5. Write settings is a yml dictionary that handles how the model should be persisted. **Required key**
 
-6. Currently, only parquet is supported for s3 filesystem. Delta tables are also supported for `local` filesystem. **Required key**
+6. Currently, `parquet` and `delta` are supported as format for storing models. **Required key**
 
 7. The mode can be either `overwrite`, `append` or `merge`. **Required key**
 

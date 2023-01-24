@@ -7,7 +7,8 @@ import pyarrow.parquet as pq
 import pyarrow.dataset as ds
 from ezt.util.config import Config
 from ezt.util.exceptions import EztConfigException
-from ezt.util.helpers import get_s3_filesystem
+from ezt.util.helpers import get_s3_filesystem, prepare_s3_path
+import deltalake as dl
 
 
 def get_source(name: str) -> pl.LazyFrame:
@@ -89,7 +90,18 @@ def _get_parq_local_source(source_dict):
 
 def _get_s3_delta_source(source_dict):
     """Function that returns a lazyframe of a remote delta-source."""
-    raise NotImplementedError("Delta sources in remote storage are not yet supported.")
+
+    if source_dict["path_type"] == "folder":
+        table_path = prepare_s3_path(source_dict["path"])
+    else:
+        raise EztConfigException(
+            'For delta-sources, the "path_type" key need to be set to "folder"'
+        )
+
+    result_lazy = pl.from_arrow(
+        dl.DeltaTable(table_uri=f"{table_path}/").to_pyarrow_table()
+    ).lazy()
+    return result_lazy
 
 
 def _get_s3_csv_source(source_dict):
