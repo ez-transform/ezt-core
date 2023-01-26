@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ez-transform"
-version = "0.1.0"
+version = "0.1.1"
 description = "Analytics engineering for data lakes."
 authors = ["John Kaustinen <jokausti@gmail.com>"]
 license = 'Apache-2.0'
@@ -16,7 +16,7 @@ python = ">=3.8, <3.11"
 click = "^8.0.3"
 Jinja2 = "^3.0.3"
 PyYAML = "^6.0"
-polars = "^0.13.38"
+polars = "^0.15.17"
 s3fs = "^2022.11.0"
 deltalake = "^0.6.2"
 graphlib-backport = "^1.0.3"
