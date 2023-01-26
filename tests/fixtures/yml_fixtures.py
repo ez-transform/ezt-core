@@ -22,6 +22,7 @@ def model_dict_s3_delta():
         "name": "my_model",
         "type": "df",
         "filesystem": "s3",
+        "path_type": "folder",
         "destination": "some-bucket",
         "write_settings": {"file_type": "delta", "how": "overwrite"},
     }

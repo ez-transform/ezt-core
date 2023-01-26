@@ -1,9 +1,10 @@
 from multiprocessing import Process, Queue
 from types import FunctionType
 
-import ezt.build.process_model
 import pyexpat
 import pytest
+
+import ezt.build.process_model
 from ezt.build.process_model import (
     _df_local_delta_processor,
     _df_local_parquet_processor,
@@ -63,8 +64,9 @@ def test_get_processor_df_local_delta(model_dict_local_delta_overwrite):
 
 def test_get_processor_df_s3_delta(model_dict_s3_delta):
 
-    with pytest.raises(NotImplementedError):
-        _get_processor(model_dict_s3_delta)
+    processor = _get_processor(model_dict_s3_delta)
+
+    assert isinstance(processor, FunctionType)
 
 
 def test_get_processor_df_local_parq(model_dict_local_parq):

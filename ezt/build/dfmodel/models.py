@@ -5,6 +5,7 @@ import polars as pl
 import pyarrow.parquet as pq
 from ezt.util.config import Config
 from ezt.util.helpers import get_s3_filesystem, prepare_s3_path
+from ezt.util.exceptions import EztAuthenticationException
 
 
 def get_model(name: str) -> pl.LazyFrame:
@@ -41,6 +42,14 @@ def _get_local_delta_model(model):
 
 
 def _get_s3_delta_model(model):
+
+    if os.getenv("AWS_ACCESS_KEY_ID") is None or os.getenv("AWS_SECRET_ACCESS_KEY") is None:
+        raise EztAuthenticationException(
+            "Environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY need to be set to authenticate to S3."
+        )
+
+    # required for writing delta tables to s3 without LockClient. Opts out of concurrent writes.
+    os.environ["AWS_S3_ALLOW_UNSAFE_RENAME"] = "true"
 
     table_path = prepare_s3_path(model["destination"])
 

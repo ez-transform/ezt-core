@@ -1,3 +1,4 @@
+import os
 import types
 
 import polars as pl
@@ -14,8 +15,10 @@ from ezt.build.dfmodel.sources import (
     _get_s3_delta_source,
     _get_s3_parq_source,
     _get_source_getter_func,
+    dl,
     get_source,
 )
+from ezt.util.exceptions import EztAuthenticationException, EztConfigException
 from tests.fixtures.yml_fixtures import source_dict_local_parq
 
 
@@ -171,10 +174,40 @@ def test_get_parq_local_source(monkeypatch, polars_lazyframe, source_dict_local_
     assert model_df.is_empty() is False
 
 
-def test_get_s3_delta_source(source_dict_local_parq):
+def test_get_s3_delta_source(
+    monkeypatch, pyarrow_table, source_dict_s3_delta, source_dict_local_csv_with_prop
+):
 
-    with pytest.raises(NotImplementedError) as e:
-        _get_s3_delta_source(source_dict_local_parq)
+    # with pytest.raises(NotImplementedError) as e:
+    #     _get_s3_delta_source(source_dict_local_parq)
+
+    monkeypatch.delenv("AWS_ACCESS_KEY_ID", raising=False)
+    monkeypatch.delenv("AWS_SECRET_ACCESS_KEY", raising=False)
+
+    with pytest.raises(EztAuthenticationException) as e:
+        _get_s3_delta_source(source_dict_s3_delta)
+
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "foo")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "bar")
+
+    with pytest.raises(EztConfigException) as e:
+        _get_s3_delta_source(source_dict_local_csv_with_prop)
+
+    class mock_DeltaTable:
+        def __init__(self, table_uri):
+            self.table_uri = table_uri
+
+        def to_pyarrow_table(self):
+            return pyarrow_table
+
+    monkeypatch.setattr(dl, "DeltaTable", mock_DeltaTable)
+
+    result = _get_s3_delta_source(source_dict_s3_delta)
+    model_df = result.collect()
+
+    assert os.getenv("AWS_S3_ALLOW_UNSAFE_RENAME") == "true"
+    assert isinstance(result, pl.LazyFrame)
+    assert model_df.is_empty() is False
 
 
 def test_get_s3_csv_source(source_dict_local_parq):

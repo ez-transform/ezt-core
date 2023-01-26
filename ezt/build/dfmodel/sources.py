@@ -6,7 +6,7 @@ import polars as pl
 import pyarrow.parquet as pq
 import pyarrow.dataset as ds
 from ezt.util.config import Config
-from ezt.util.exceptions import EztConfigException
+from ezt.util.exceptions import EztAuthenticationException, EztConfigException
 from ezt.util.helpers import get_s3_filesystem, prepare_s3_path
 import deltalake as dl
 
@@ -90,6 +90,13 @@ def _get_parq_local_source(source_dict):
 
 def _get_s3_delta_source(source_dict):
     """Function that returns a lazyframe of a remote delta-source."""
+
+    if os.getenv("AWS_ACCESS_KEY_ID") is None or os.getenv("AWS_SECRET_ACCESS_KEY") is None:
+        raise EztAuthenticationException(
+            "Environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY need to be set to authenticate to S3."
+        )
+
+    os.environ["AWS_S3_ALLOW_UNSAFE_RENAME"] = "true"
 
     if source_dict["path_type"] == "folder":
         table_path = prepare_s3_path(source_dict["path"])

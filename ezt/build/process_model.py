@@ -1,3 +1,4 @@
+import os
 import time
 import traceback
 from multiprocessing import Queue
@@ -9,7 +10,7 @@ from ezt.build.dfmodel.merge import calculate_merge
 
 # from ezt.build.dfmodel.register_df_sources import get_sources
 from ezt.build.dfmodel.persist_delta import create_delta_table
-from ezt.util.exceptions import EztConfigException
+from ezt.util.exceptions import EztAuthenticationException, EztConfigException
 from ezt.util.fs import prepare_local
 from ezt.util.helpers import get_s3_filesystem, prepare_s3_path
 
@@ -161,6 +162,14 @@ def _df_local_delta_processor(model_dict, ezt_module):
 
 def _df_s3_delta_processor(model_dict, ezt_module):
     """Function that processes DataFrame models that are to be stored as delta-tables in s3."""
+
+    if os.getenv("AWS_ACCESS_KEY_ID") is None or os.getenv("AWS_SECRET_ACCESS_KEY") is None:
+        raise EztAuthenticationException(
+            "Environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY need to be set to authenticate to S3."
+        )
+
+    # required for writing delta tables to s3 without LockClient. Opts out of concurrent writes.
+    os.environ["AWS_S3_ALLOW_UNSAFE_RENAME"] = "true"
 
     path = prepare_s3_path(model_dict["destination"])
 

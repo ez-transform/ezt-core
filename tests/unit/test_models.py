@@ -1,11 +1,13 @@
+import os
 import types
 
 import deltalake as dl
-import ezt.util.config
-import ezt.util.helpers
-import polars as pl
 import pyarrow.parquet as pq
 import pytest
+from s3fs import S3FileSystem
+
+import ezt.util.config
+import ezt.util.helpers
 from ezt.build.dfmodel.models import (
     _get_local_delta_model,
     _get_local_parq_model,
@@ -13,8 +15,9 @@ from ezt.build.dfmodel.models import (
     _get_s3_delta_model,
     _get_s3_parq_model,
     get_model,
+    pl,
 )
-from s3fs import S3FileSystem
+from ezt.util.exceptions import EztAuthenticationException
 
 
 def test_get_model(monkeypatch, conf_fixture, pyarrow_table):
@@ -63,10 +66,33 @@ def test_get_model_getter(
     assert s3_parq_getter.__name__ == "_get_s3_parq_model"
 
 
-def test_get_s3_delta_model(model_dict_s3_delta):
+@pytest.mark.timeout(10)
+def test_get_s3_delta_model(monkeypatch, pyarrow_table, model_dict_s3_delta):
 
-    with pytest.raises(NotImplementedError) as e:
+    monkeypatch.delenv("AWS_ACCESS_KEY_ID", raising=False)
+    monkeypatch.delenv("AWS_SECRET_ACCESS_KEY", raising=False)
+
+    with pytest.raises(EztAuthenticationException) as e:
         _get_s3_delta_model(model_dict_s3_delta)
+
+    class mock_DeltaTable:
+        def __init__(self, table_uri):
+            self.table_uri = table_uri
+
+        def to_pyarrow_table(self):
+            return pyarrow_table
+
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "foo")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "bar")
+
+    monkeypatch.setattr(dl, "DeltaTable", mock_DeltaTable)
+
+    result = _get_s3_delta_model(model_dict_s3_delta)
+    model_df = result.collect()
+
+    assert os.getenv("AWS_S3_ALLOW_UNSAFE_RENAME") == "true"
+    assert isinstance(result, pl.LazyFrame)
+    assert model_df.is_empty() is False
 
 
 def test_get_s3_parq_model(monkeypatch, pyarrow_dataset, model_dict_s3_parq):
