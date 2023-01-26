@@ -10,6 +10,6 @@
 * Possibility to use fully-fledged software development practices, such as version control, CI/CD, unit testing etc.
 * CLI-based interface for easy use in CI/CD pipelines
 * Freedom to choose your own compute engine
-* Delta-lake support through delta-rs
+* Deltalake support through delta-rs
 
 Take a look at the [Guides](pages/guides/installation.md)-section in order to learn how to install Ezt and build your first models.

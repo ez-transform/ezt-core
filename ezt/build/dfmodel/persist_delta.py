@@ -41,6 +41,7 @@ def create_delta_table(
     try:
         dl.write_deltalake(data=update_types(df.to_arrow()), table_or_uri=f"{dest}/{name}")
     except AssertionError:
+        # delta table already exists
         _write_to_delta_table(df, dest, name, write_mode_settings)
 
 

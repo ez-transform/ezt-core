@@ -10,7 +10,7 @@ To register a source, you need to have knowledge about the following:
 
 The way to set up a source slightly differs depending on the filesystem and file type.
 
-Currently Ezt only supports parquet as filetype for sources in S3. In the future, the plan is to support delta-tables as well.
+As of version 0.1.1, Ezt supports both parquet and delta as filetype for sources.
 
 The yml definition of a source in S3 can look something like this:
 

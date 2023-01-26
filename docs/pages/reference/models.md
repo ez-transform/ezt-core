@@ -42,7 +42,7 @@ models: #(1)
 
 6. This key is **required** and the value is an object with the keys `file_type` and `mode`.
 
-7. This key is **required** and tells ezt how to persist the model. For S3-models, only parquet is supported at the moment. Local filesystem models supports ´parquet´ and ´delta´.
+7. This key is **required** and tells ezt how to persist the model. Values ´parquet´ and ´delta´ are supported at the moment, and more will potentially be added in the future.
 
 8. This key is **required** and tells ezt if processed data should be appended, overwritten or merged. `merge` requires an additional key under `write_settings` named `merge_key` to specify on which column the merge-logic should be calculated.
 
@@ -52,4 +52,4 @@ Ezt currently supports models in the **local filesystem** and in **AWS S3**. If 
 
 ## :material-format-columns: Supported file types
 
-Ezt currently supports Parquet and delta as file types for models. For S3-models only parquet is currently supported.
+Ezt currently supports Parquet and delta as file types for models.

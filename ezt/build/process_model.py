@@ -1,3 +1,4 @@
+import os
 import time
 import traceback
 from multiprocessing import Queue
@@ -9,9 +10,9 @@ from ezt.build.dfmodel.merge import calculate_merge
 
 # from ezt.build.dfmodel.register_df_sources import get_sources
 from ezt.build.dfmodel.persist_delta import create_delta_table
-from ezt.util.exceptions import EztConfigException
+from ezt.util.exceptions import EztAuthenticationException, EztConfigException
 from ezt.util.fs import prepare_local
-from ezt.util.helpers import get_s3_filesystem
+from ezt.util.helpers import get_s3_filesystem, prepare_s3_path
 
 
 def process_model(
@@ -82,8 +83,7 @@ def _get_processor(model_dict):
             model_dict["write_settings"]["file_type"] == "delta"
             and model_dict["filesystem"] == "s3"
         ):
-            raise NotImplementedError("Deltalake does not support storing deltatables in S3 yet.")
-            # TODO: When delta-rs supports remote storage for creating delta tables.
+            return _df_s3_delta_processor
 
         elif (
             model_dict["write_settings"]["file_type"] == "parquet"
@@ -155,6 +155,27 @@ def _df_local_delta_processor(model_dict, ezt_module):
     result = create_delta_table(
         df=ezt_module.df_model(),
         dest=f'{model_dict["destination"]}',
+        name=f'{model_dict["name"]}',
+        write_mode_settings=model_dict["write_settings"],
+    )
+
+
+def _df_s3_delta_processor(model_dict, ezt_module):
+    """Function that processes DataFrame models that are to be stored as delta-tables in s3."""
+
+    if os.getenv("AWS_ACCESS_KEY_ID") is None or os.getenv("AWS_SECRET_ACCESS_KEY") is None:
+        raise EztAuthenticationException(
+            "Environment variables AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY need to be set to authenticate to S3."
+        )
+
+    # required for writing delta tables to s3 without LockClient. Opts out of concurrent writes.
+    os.environ["AWS_S3_ALLOW_UNSAFE_RENAME"] = "true"
+
+    path = prepare_s3_path(model_dict["destination"])
+
+    result = create_delta_table(
+        df=ezt_module.df_model(),
+        dest=path,
         name=f'{model_dict["name"]}',
         write_mode_settings=model_dict["write_settings"],
     )

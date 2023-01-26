@@ -76,3 +76,13 @@ class EztMergeException(EztException):
     def __init__(self, message) -> None:
         self.message = message
         super().__init__(self.message)
+
+
+class EztAuthenticationException(EztException):
+    """
+    Raised when Ezt notices that authentication credentials are missing.
+    """
+
+    def __init__(self, message="Missing authentication credentials.") -> None:
+        self.message = message
+        super().__init__(self.message)

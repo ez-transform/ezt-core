@@ -88,3 +88,18 @@ def get_s3_filesystem() -> S3FileSystem:
     secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 
     return S3FileSystem(key=access_key, secret=secret_key)
+
+
+def prepare_s3_path(path):
+
+    if path.startswith("s3://"):
+        pass
+    else:
+        path = f"s3://{path}"
+
+    if path.endswith("/"):
+        path = path[:-1]
+    else:
+        pass
+
+    return path
