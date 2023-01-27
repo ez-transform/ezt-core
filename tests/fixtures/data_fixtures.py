@@ -30,7 +30,7 @@ def overlapping_rows():
 def data_update():
     file_path = os.path.dirname(os.path.realpath(__file__))
     data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", sep=",", has_header=True)
-    source_data = data[:75].with_column(
+    source_data = data[:75].with_columns(
         pl.when(pl.col("id") == 10)
         .then("UPDATED_NAME")
         .otherwise(pl.col("first_name"))
