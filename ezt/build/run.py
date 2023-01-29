@@ -11,7 +11,11 @@ from rich.console import Console
 class Runner:
     def __init__(self, config: Config):
         self.config = config
-        self.logger = EztLogger(logs_destination=self.config.project["logs_destination"])
+        self.logger = EztLogger(
+            logs_destination=config.project["logs_destination"]
+            if "logs_destination" in config.project
+            else None
+        )
 
     @property
     def model_order(self):
