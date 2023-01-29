@@ -1,18 +1,24 @@
 import dis
 import os
-from distutils.dir_util import copy_tree
+
+# from distutils.dir_util import copy_tree
+import shutil
 
 from s3fs import S3FileSystem
 from yaml import Loader, load
 
 
 def copy_starter(path, name) -> None:
-    from ezt.include.starter_project import PACKAGE_PATH as starter_project_directory
-
     """
     Function that copies the standard starting library to the location where the user wants to initialize their ezt project.
     """
-    copy_tree(starter_project_directory, f"{path}/{name}")
+    from ezt.include.starter_project import PACKAGE_PATH as starter_project_directory
+
+    IGNORE = "__pycache__"
+
+    shutil.copytree(
+        starter_project_directory, f"{path}/{name}", ignore=shutil.ignore_patterns(IGNORE)
+    )
 
 
 def parse_yaml(file: str) -> dict:
