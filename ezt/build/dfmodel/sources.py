@@ -174,3 +174,8 @@ def _get_adls_delta_source(source_dict):
         dl.DeltaTable(table_uri=f"{table_path}/").to_pyarrow_table()
     ).lazy()
     return result_lazy
+
+
+def _get_adls_csv_source(source_dict):
+    """Function that returns a lazyframe of a remote delta-source in s3."""
+    raise NotImplementedError("CSV sources in remote storage are not yet supported.")
