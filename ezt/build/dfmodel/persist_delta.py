@@ -36,20 +36,23 @@ def create_delta_table(
     dest: str,
     name: str,
     write_mode_settings: dict,
+    storage_options: dict,
 ):
     """Writes delta table to destination."""
+
     try:
-        dl.write_deltalake(data=update_types(df.to_arrow()), table_or_uri=f"{dest}/{name}")
+        dl.write_deltalake(
+            data=update_types(df.to_arrow()),
+            table_or_uri=f"{dest}/{name}",
+            storage_options=storage_options,
+        )
     except AssertionError:
         # delta table already exists
-        _write_to_delta_table(df, dest, name, write_mode_settings)
+        _write_to_delta_table(df, dest, name, write_mode_settings, storage_options)
 
 
 def _write_to_delta_table(
-    df: pl.DataFrame,
-    dest: str,
-    name: str,
-    write_mode_settings: dict,
+    df: pl.DataFrame, dest: str, name: str, write_mode_settings: dict, storage_options: dict
 ):
     # delta table already exists
 
@@ -58,6 +61,7 @@ def _write_to_delta_table(
             data=update_types(df.to_arrow()),
             table_or_uri=f"{dest}/{name}",
             mode=write_mode_settings["how"],
+            storage_options=storage_options,
         )
     elif write_mode_settings["how"] == "merge":
         dl.write_deltalake(
@@ -72,4 +76,5 @@ def _write_to_delta_table(
             ),
             table_or_uri=f"{dest}/{name}",
             mode="overwrite",
+            storage_options=storage_options,
         )
