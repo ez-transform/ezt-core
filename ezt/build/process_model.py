@@ -208,11 +208,13 @@ def _df_adls_parquet_processor(model_dict, ezt_module):
     df = ezt_module.df_model()
     table = df.to_arrow()
 
+    target_path = prepare_adls_path(model_dict["destination"])
+
     if model_dict["write_settings"]["mode"] == "overwrite":
-        target_path = f'abfss://{model_dict["destination"]}/{model_dict["name"]}/{model_dict["name"]}.parquet'
+        target_path = f'{target_path}/{model_dict["name"]}/{model_dict["name"]}.parquet'
         pq.write_table(table=table, filesystem=adls, where=target_path)
     elif model_dict["write_settings"]["mode"] == "append":
-        target_path = f's3://{model_dict["destination"]}/{model_dict["name"]}'
+        target_path = f'{target_path}/{model_dict["name"]}'
         pq.write_to_dataset(table=table, root_path=target_path, filesystem=adls)
     elif model_dict["write_settings"]["mode"] == "merge":
         # if target does not exists, just write a parquet file to destination

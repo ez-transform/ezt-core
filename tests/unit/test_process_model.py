@@ -83,6 +83,20 @@ def test_get_processor_df_s3_parq(model_dict_s3_parq):
     assert isinstance(processor, FunctionType)
 
 
+def test_get_processor_df_s3_parq(model_dict_adls_parq):
+
+    processor = _get_processor(model_dict_adls_parq)
+
+    assert isinstance(processor, FunctionType)
+
+
+def test_get_processor_df_s3_parq(model_dict_adls_delta):
+
+    processor = _get_processor(model_dict_adls_delta)
+
+    assert isinstance(processor, FunctionType)
+
+
 def test_get_processor_invalid_type(invalid_model_type_dict):
 
     with pytest.raises(EztConfigException):

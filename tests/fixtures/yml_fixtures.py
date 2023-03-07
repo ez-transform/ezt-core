@@ -56,6 +56,33 @@ def model_dict_s3_parq():
 
 
 @pytest.fixture
+def model_dict_adls_parq():
+
+    model_dict = {
+        "name": "my_model",
+        "type": "df",
+        "filesystem": "adls",
+        "destination": "some-container",
+        "write_settings": {"file_type": "parquet", "how": "overwrite"},
+    }
+    return model_dict
+
+
+@pytest.fixture
+def model_dict_adls_delta():
+
+    model_dict = {
+        "name": "my_model",
+        "type": "df",
+        "filesystem": "adls",
+        "path_type": "folder",
+        "destination": "some-container",
+        "write_settings": {"file_type": "delta", "how": "overwrite"},
+    }
+    return model_dict
+
+
+@pytest.fixture
 def project_yml(tmp_path):
     """Fixtures that creates a temporary yml file representing a ezt_project.yml."""
 

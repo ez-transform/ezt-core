@@ -56,14 +56,14 @@ def _write_to_delta_table(
 ):
     # delta table already exists
 
-    if write_mode_settings["how"] in ("overwrite", "append"):
+    if write_mode_settings["mode"] in ("overwrite", "append"):
         dl.write_deltalake(
             data=update_types(df.to_arrow()),
             table_or_uri=f"{dest}/{name}",
-            mode=write_mode_settings["how"],
+            mode=write_mode_settings["mode"],
             storage_options=storage_options,
         )
-    elif write_mode_settings["how"] == "merge":
+    elif write_mode_settings["mode"] == "merge":
         dl.write_deltalake(
             data=update_types(
                 calculate_merge(
