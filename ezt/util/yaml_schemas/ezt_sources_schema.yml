@@ -8,11 +8,11 @@ properties:
         name:
           type: string
         filesystem:
-          enum: [local, s3]
+          enum: [local, s3, adls]
         path_type:
           enum: [file, folder]
         format:
-          enum: [csv, parquet]
+          enum: [csv, parquet, delta]
         path:
           type: string
       required:

@@ -4,8 +4,11 @@ import os
 # from distutils.dir_util import copy_tree
 import shutil
 
+from adlfs import AzureBlobFileSystem
 from s3fs import S3FileSystem
 from yaml import Loader, load
+
+from ezt.util.exceptions import EztAuthenticationException
 
 
 def copy_starter(path, name) -> None:
@@ -90,10 +93,37 @@ def get_model_dependencies(model):
 
 
 def get_s3_filesystem() -> S3FileSystem:
+
     access_key = os.getenv("AWS_ACCESS_KEY_ID")
     secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 
     return S3FileSystem(key=access_key, secret=secret_key)
+
+
+def get_adls_filesystem() -> AzureBlobFileSystem:
+
+    if (
+        os.getenv("AZURE_STORAGE_ACCOUNT_NAME") is None
+        or os.getenv("AZURE_STORAGE_TENANT_ID") is None
+        or os.getenv("AZURE_STORAGE_CLIENT_ID") is None
+        or os.getenv("AZURE_STORAGE_CLIENT_SECRET") is None
+    ):
+        raise EztAuthenticationException(
+            "Environment variables AZURE_STORAGE_ACCOUNT_NAME, AZURE_STORAGE_TENANT_ID, AZURE_STORAGE_CLIENT_ID, AZURE_STORAGE_CLIENT_SECRET all need to be set to authenticate to ADLS. \
+            Access key authentication not supported yet."
+        )
+
+    account_name = os.getenv("AZURE_STORAGE_ACCOUNT_NAME")
+    tenant_id = os.getenv("AZURE_STORAGE_TENANT_ID")
+    client_id = os.getenv("AZURE_STORAGE_CLIENT_ID")
+    client_secret = os.getenv("AZURE_STORAGE_CLIENT_SECRET")
+
+    return AzureBlobFileSystem(
+        account_name=account_name,
+        tenant_id=tenant_id,
+        client_id=client_id,
+        client_secret=client_secret,
+    )
 
 
 def prepare_s3_path(path):
@@ -102,6 +132,25 @@ def prepare_s3_path(path):
         pass
     else:
         path = f"s3://{path}"
+
+    if path.endswith("/"):
+        path = path[:-1]
+    else:
+        pass
+
+    return path
+
+
+def prepare_adls_path(path):
+
+    if path.startswith("abfss://"):
+        pass
+    elif path.startswith("abfs://"):
+        path = f"abfss://{path[8:]}"
+    elif path.startswith("adl://"):
+        path = f"abfss://{path[6:]}"
+    else:
+        path = f"abfss://{path}"
 
     if path.endswith("/"):
         path = path[:-1]

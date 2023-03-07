@@ -1,8 +1,9 @@
 import os
 
 import deltalake as dl
-import ezt.build.dfmodel.persist_delta
 import pyarrow as pa
+
+import ezt.build.dfmodel.persist_delta
 from ezt.build.dfmodel.persist_delta import create_delta_table, update_types
 
 
@@ -22,7 +23,9 @@ def test_create_delta_table_new(tmp_path, polars_dataframe, write_mode_settings)
     name = "some_name"
     append = write_mode_settings["append"]
 
-    create_delta_table(df=polars_dataframe, dest=path, name=name, write_mode_settings=append)
+    create_delta_table(
+        df=polars_dataframe, dest=path, name=name, write_mode_settings=append, storage_options=None
+    )
 
     assert os.path.isdir(f"{path}/{name}")
     dl.DeltaTable(f"{path}/{name}")
@@ -43,6 +46,7 @@ def test_create_delta_table_overwrite(
         dest=delta_table_path,
         name=name,
         write_mode_settings=overwrite,
+        storage_options=None,
     )
 
     assert os.path.isdir(f"{delta_table_path}/{name}")
@@ -59,6 +63,7 @@ def test_create_delta_table_append(polars_dataframe, delta_table_path, write_mod
         dest=delta_table_path,
         name=name,
         write_mode_settings=append,
+        storage_options=None,
     )
 
     assert os.path.isdir(f"{delta_table_path}/{name}")
@@ -76,6 +81,7 @@ def test_create_delta_table_merge(polars_dataframe, delta_table_path, write_mode
         dest=delta_table_path,
         name=name,
         write_mode_settings=merge,
+        storage_options=None,
     )
 
     assert os.path.isdir(f"{delta_table_path}/{name}")
