@@ -24,7 +24,7 @@ def test_create_delta_table_new(tmp_path, polars_dataframe, write_mode_settings)
     append = write_mode_settings["append"]
 
     create_delta_table(
-        df=polars_dataframe, dest=path, name=name, write_mode_settings=append, storage_options=None
+        df=polars_dataframe, dest=path, name=name, write_mode_settings=append, storage_options={}
     )
 
     assert os.path.isdir(f"{path}/{name}")
@@ -46,7 +46,7 @@ def test_create_delta_table_overwrite(
         dest=delta_table_path,
         name=name,
         write_mode_settings=overwrite,
-        storage_options=None,
+        storage_options={},
     )
 
     assert os.path.isdir(f"{delta_table_path}/{name}")
@@ -63,7 +63,7 @@ def test_create_delta_table_append(polars_dataframe, delta_table_path, write_mod
         dest=delta_table_path,
         name=name,
         write_mode_settings=append,
-        storage_options=None,
+        storage_options={},
     )
 
     assert os.path.isdir(f"{delta_table_path}/{name}")
@@ -81,7 +81,7 @@ def test_create_delta_table_merge(polars_dataframe, delta_table_path, write_mode
         dest=delta_table_path,
         name=name,
         write_mode_settings=merge,
-        storage_options=None,
+        storage_options={},
     )
 
     assert os.path.isdir(f"{delta_table_path}/{name}")
