@@ -105,13 +105,13 @@ def write_mode_settings():
     """Returns a dictionary with different write_mode_settings (overwrite, append and merge)."""
     all_settings = {
         "overwrite": {
-            "how": "overwrite",
+            "mode": "overwrite",
         },
         "append": {
-            "how": "append",
+            "mode": "append",
         },
         "merge": {
-            "how": "merge",
+            "mode": "merge",
             "merge_col": "id",
         },
     }
@@ -225,7 +225,7 @@ def invalid_model_dict():
         "type": "df",
         "filesystem": "s3",
         "destination": "some_bucket",
-        "write_settings": {"file_type": "parquet", "mode": "invalid_mode"},
+        "write_settings": {"file_type": "parquet", "how": "invalid_mode"},
     }
 
     return model_dict
@@ -251,7 +251,7 @@ def invalid_model_type_dict():
         "type": "invalid_type",
         "filesystem": "s3",
         "destination": "some_bucket",
-        "write_settings": {"file_type": "parquet", "mode": "invalid_mode"},
+        "write_settings": {"file_type": "parquet", "how": "invalid_mode"},
     }
 
     return model_dict

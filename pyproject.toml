@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ez-transform"
-version = "0.1.1"
+version = "0.1.2"
 description = "Analytics engineering for data lakes."
 authors = ["John Kaustinen <jokausti@gmail.com>"]
 license = 'Apache-2.0'
