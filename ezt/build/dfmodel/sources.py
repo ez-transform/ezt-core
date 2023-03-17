@@ -16,9 +16,13 @@ from ezt.util.helpers import (
 import deltalake as dl
 
 
-def get_source(name: str) -> pl.LazyFrame:
+def get_source(name: str, config_base_folder: str = None) -> pl.LazyFrame:
+    """Get a source by name."""
 
-    config = Config(os.getcwd())
+    if config_base_folder:
+        config = Config(config_base_folder)
+    else:
+        config = Config(os.getcwd())
 
     source_dict = config.get_source(name)
 
