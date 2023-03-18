@@ -3,6 +3,7 @@ import os
 import polars as pl
 
 # import pyarrow.dataset as
+from pyarrow import csv
 import pyarrow.parquet as pq
 import pyarrow.dataset as ds
 from ezt.util.config import Config
@@ -131,7 +132,21 @@ def _get_s3_delta_source(source_dict):
 
 def _get_s3_csv_source(source_dict):
     """Function that returns a lazyframe of a remote delta-source in s3."""
-    raise NotImplementedError("CSV sources in remote storage are not yet supported.")
+
+    path = prepare_s3_path(source_dict["path"])
+    s3 = get_s3_filesystem()
+
+    with s3.open(source_dict["path"]) as f:
+
+        if "csv_properties" in source_dict:
+            table = csv.read_csv(
+                input_file=f, parse_options=csv.ParseOptions(**source_dict["csv_properties"])
+            )
+        else:
+            table = csv.read_csv(input_file=f)
+
+    polars_lf = pl.from_arrow(table).lazy()
+    return polars_lf
 
 
 def _get_adls_parq_source(source_dict):
@@ -182,4 +197,18 @@ def _get_adls_delta_source(source_dict):
 
 def _get_adls_csv_source(source_dict):
     """Function that returns a lazyframe of a remote delta-source in s3."""
-    raise NotImplementedError("CSV sources in remote storage are not yet supported.")
+
+    path = prepare_adls_path(source_dict["path"])
+    adls = get_adls_filesystem()
+
+    with adls.open(source_dict["path"]) as f:
+
+        if "csv_properties" in source_dict:
+            table = csv.read_csv(
+                input_file=f, parse_options=csv.ParseOptions(**source_dict["csv_properties"])
+            )
+        else:
+            table = csv.read_csv(input_file=f)
+
+    polars_lf = pl.from_arrow(table).lazy()
+    return polars_lf
