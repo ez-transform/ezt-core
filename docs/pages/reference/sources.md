@@ -44,4 +44,4 @@ A source in Ezt needs different configuration settings depending on the filesyst
 
 ## :material-format-columns: Supported file types
 
-Ezt currently supports Parquet and CSV as file types for sources.
+Ezt currently supports CSV, Parquet and Delta as file types for sources.

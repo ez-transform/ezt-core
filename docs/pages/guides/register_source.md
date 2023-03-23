@@ -10,7 +10,7 @@ To register a source, you need to have knowledge about the following:
 
 The way to set up a source slightly differs depending on the filesystem and file type.
 
-As of version 0.1.1, Ezt supports both parquet and delta as filetype for sources.
+Ezt supports csv, parquet and delta as filetype for sources.
 
 The yml definition of a source in S3 can look something like this:
 
@@ -29,7 +29,7 @@ sources:
 
 3. `path_type` can be either `file` or `folder`. When set to `file`, the `path` needs to point to a specific file, and when set to `folder`, the `path` needs to point to a folder and every file in that folder will get included in the dataset.
 
-4. File-format in which the data is stored. Only parquet is supported at the moment for sources in S3.
+4. File-format in which the data is stored.
 
 5. `path` points to a specific file or folder depending on the `path_type` value.
 
