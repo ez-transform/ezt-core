@@ -13,11 +13,11 @@ from ezt.util.helpers import (
 from ezt.util.exceptions import EztAuthenticationException
 
 
-def get_model(name: str, config_base_folder: str = None) -> pl.LazyFrame:
+def get_model(name: str, project_base_dir: str = None) -> pl.LazyFrame:
     """Returns the model as a polars lazyframe."""
 
-    if config_base_folder:
-        model = Config(config_base_folder).get_model(name)
+    if project_base_dir:
+        model = Config(project_base_dir).get_model(name)
     else:
         model = Config(os.getcwd()).get_model(name)
 

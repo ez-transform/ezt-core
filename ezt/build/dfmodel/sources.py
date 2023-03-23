@@ -17,11 +17,11 @@ from ezt.util.helpers import (
 import deltalake as dl
 
 
-def get_source(name: str, config_base_folder: str = None) -> pl.LazyFrame:
+def get_source(name: str, project_base_dir: str = None) -> pl.LazyFrame:
     """Get a source by name."""
 
-    if config_base_folder:
-        config = Config(config_base_folder)
+    if project_base_dir:
+        config = Config(project_base_dir)
     else:
         config = Config(os.getcwd())
 
