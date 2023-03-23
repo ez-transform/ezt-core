@@ -164,13 +164,9 @@ def source_dict_s3_csv():
     source_dict = {
         "name": "my_source",
         "filesystem": "s3",
-        "path_type": "folder",
+        "path_type": "file",
         "format": "csv",
-        "bucket": "some_bucket",
-        "folder": "some_folder",
-        "csv_properties": {
-            "some_property": "some_val",
-        },
+        "path": "some_bucket/some_folder/my_csv.csv",
     }
     return source_dict
 
