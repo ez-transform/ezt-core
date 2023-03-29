@@ -9,6 +9,7 @@ from ezt.util.helpers import (
     prepare_s3_path,
     get_adls_filesystem,
     prepare_adls_path,
+    prepare_adls_path_pqdataset,
 )
 from ezt.util.exceptions import EztAuthenticationException
 
@@ -110,8 +111,8 @@ def _get_adls_parq_model(model):
 
     adls = get_adls_filesystem()
 
-    dataset = pq.ParquetDataset(
-        path_or_paths=f"{model['destination']}/{model['name']}", filesystem=adls
-    )
+    pa_dataset_path = prepare_adls_path_pqdataset(f"{model['destination']}/{model['name']}")
+
+    dataset = pq.ParquetDataset(path_or_paths=pa_dataset_path, filesystem=adls)
 
     return pl.from_arrow(dataset.read()).lazy()

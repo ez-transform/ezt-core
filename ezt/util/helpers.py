@@ -158,3 +158,22 @@ def prepare_adls_path(path):
         pass
 
     return path
+
+
+def prepare_adls_path_pqdataset(path):
+
+    if path.startswith("abfss://"):
+        path = path[8:]
+    elif path.startswith("abfs://"):
+        path = path[7:]
+    elif path.startswith("adl://"):
+        path = path[6:]
+    else:
+        pass
+
+    if path.endswith("/"):
+        path = path[:-1]
+    else:
+        pass
+
+    return path
