@@ -4,7 +4,6 @@ sources:
     filesystem: local
     path: add/your/path/here
     path_type: file
-    filename: filename
     format: parquet
 
 
