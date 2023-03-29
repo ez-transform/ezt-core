@@ -1,4 +1,4 @@
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 from .build.dfmodel.models import get_model
 from .build.dfmodel.py_model import py_model
