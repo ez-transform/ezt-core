@@ -2,7 +2,7 @@ name: Test Python
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, edited]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -33,10 +33,10 @@ jobs:
           # cache-dependency-path: 'py-polars/requirements-dev.txt'
 
       - name: Cache Poetry install
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.local
-          key: poetry-1.2.2-0
+          key: poetry-1.2.2-${{ job.ENVIRONMENT }}-${{ matrix.python-version }}
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -46,7 +46,7 @@ jobs:
           virtualenvs-in-project: true
 
       - name: Cache deps
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: .venv
           key: pytestdeps-${{ job.ENVIRONMENT }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
