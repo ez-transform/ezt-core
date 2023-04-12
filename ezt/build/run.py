@@ -9,6 +9,8 @@ from rich.console import Console
 
 
 class Runner:
+    """Class that is handling one ezt run invokation."""
+
     def __init__(self, config: Config):
         self.config = config
         self.logger = EztLogger(
@@ -21,8 +23,8 @@ class Runner:
     def model_order(self):
         return list(self.config.execution_order.static_order())
 
-    def Execute(self, model_name, model_group) -> ExecutionResult:
-
+    def Execute(self, model_name: str = None, model_group: str = None) -> ExecutionResult:
+        """Executes the models in a parallell fashion."""
         execution_result = ExecutionResult()
         console = Console()
 

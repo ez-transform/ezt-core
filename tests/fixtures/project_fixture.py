@@ -3,6 +3,7 @@ import shutil
 
 import pytest
 import yaml
+
 from ezt.util.config import Config
 from ezt.util.helpers import copy_starter
 
@@ -79,3 +80,10 @@ def log_folder_path(tmp_path):
     path = tmp_path / "logs_2"
 
     return path
+
+
+@pytest.fixture
+def change_cwd(request, path):
+    os.chdir(path)
+    yield
+    os.chdir(request.fspath.invocation_dir)
