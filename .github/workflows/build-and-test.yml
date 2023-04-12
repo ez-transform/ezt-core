@@ -1,8 +1,7 @@
 name: Test Python
 
 on:
-  pull_request:
-    types: [opened, reopened, edited]
+  pull_request
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -31,7 +30,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.local
-          key: poetry-1.2.2-${{ job.ENVIRONMENT }}-${{ matrix.python-version }}
+          key: poetry-1.2.2-${{ matrix.python-version }}
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -44,11 +43,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .venv
-          key: pytestdeps-${{ job.ENVIRONMENT }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          key: pytestdeps-ubuntu-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
         run: poetry install --no-interaction --with dev
         if: steps.cache-deps.outputs.cache-hit != 'true'
       
       - name: run tests
-        run: pytest
+        run: poetry run pytest
