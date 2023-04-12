@@ -1,0 +1,108 @@
+name: Test Python
+
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# defaults:
+#   run:
+#     working-directory: py-polars
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: ubuntu
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          # cache: 'pip'
+          # cache-dependency-path: 'py-polars/requirements-dev.txt'
+
+      - name: Cache Poetry install
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: poetry-1.2.2-${{ job.ENVIRONMENT }}-${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.2.2
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Cache deps
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: pytestdeps-${{ job.ENVIRONMENT }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --with dev
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+      
+      - name: run tests
+        run: pytest
+      
+      
+  # windows:
+  #   runs-on: windows-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: ['3.11']
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #         cache: pip
+  #         cache-dependency-path: py-polars/requirements-dev.txt
+
+  #     - name: Install Python dependencies
+  #       run: |
+  #         pip install --upgrade pip
+  #         pip install -r requirements-dev.txt
+  #     - name: Set up Rust
+  #       run: rustup show
+
+  #     - name: Cache Rust
+  #       uses: Swatinem/rust-cache@v2
+  #       with:
+  #         workspaces: py-polars
+
+  #     - name: Install Polars
+  #       shell: bash
+  #       env:
+  #         RUSTFLAGS: -C debuginfo=0  # Do not produce debug symbols to keep memory usage down
+  #       run: |
+  #         maturin build
+  #         pip install target/wheels/polars-*.whl
+  #     - name: Run tests
+  #       run: pytest -m "not benchmark"
+
+  #     - name: Check import without optional dependencies
+  #       run: |
+  #         pip uninstall pandas -y
+  #         python -c 'import polars'
+  #         pip uninstall numpy -y
+  #         python -c 'import polars'
+  #         pip uninstall pyarrow -y
+  #         python -c 'import polars'
