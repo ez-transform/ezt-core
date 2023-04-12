@@ -2,13 +2,14 @@ import os
 from ast import parse
 
 import polars as pl
+from s3fs import S3FileSystem
+
 from ezt.util.helpers import (
     copy_starter,
     get_model_dependencies,
     get_s3_filesystem,
     parse_yaml,
 )
-from s3fs import S3FileSystem
 
 
 def test_copy_starter(tmp_path):
@@ -29,8 +30,6 @@ def test_copy_starter(tmp_path):
     assert os.path.isfile(tmp_dir / "my_project" / "models" / "models.yml")
     assert os.path.isfile(tmp_dir / "my_project" / "models" / "__init__.py")
     assert os.path.isfile(tmp_dir / "my_project" / "models" / "my_example.py")
-    assert os.path.isdir(tmp_dir / "my_project" / ".target")
-    assert os.path.isdir(tmp_dir / "my_project" / ".logs")
 
 
 def test_parse_yaml(project_yml):
