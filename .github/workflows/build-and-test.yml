@@ -52,7 +52,7 @@ jobs:
           key: "pytestdeps-$ENVIRONMENT-{{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}"
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --with dev
         if: steps.cache-deps.outputs.cache-hit != 'true'
       
       - name: run tests
