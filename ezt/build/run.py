@@ -1,4 +1,5 @@
 import traceback
+import multiprocessing as mp
 from multiprocessing import Process, Queue
 
 from ezt.build.process_model import process_model
@@ -6,6 +7,7 @@ from ezt.util.config import Config
 from ezt.util.logger import EztLogger
 from ezt.util.result import ExecutionResult, ModelResult
 from rich.console import Console
+from sys import platform
 
 
 class Runner:
@@ -27,6 +29,10 @@ class Runner:
         """Executes the models in a parallell fashion."""
         execution_result = ExecutionResult()
         console = Console()
+
+        # macOS has issues with pickling when using 'spawn'
+        if platform == "darwin":
+            mp.set_start_method("forkserver")
 
         # log models to be processed
         try:
