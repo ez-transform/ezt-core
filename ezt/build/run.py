@@ -32,7 +32,7 @@ class Runner:
 
         # macOS has issues with pickling when using 'spawn'
         if platform == "darwin":
-            mp.set_start_method("forkserver")
+            mp.set_start_method("forkserver", force=True)
 
         # log models to be processed
         try:
