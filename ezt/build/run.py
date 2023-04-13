@@ -1,6 +1,6 @@
 import traceback
-import multiprocessing as mp
-from multiprocessing import Process, Queue
+import multiprocess as mp
+from multiprocess import Process, Queue
 
 from ezt.build.process_model import process_model
 from ezt.util.config import Config
@@ -30,10 +30,6 @@ class Runner:
         execution_result = ExecutionResult()
         console = Console()
 
-        # macOS has issues with pickling when using 'spawn'
-        if platform == "darwin":
-            mp.set_start_method("forkserver", force=True)
-
         # log models to be processed
         try:
             self.logger.log_info(
@@ -46,7 +42,7 @@ class Runner:
         self.logger.log_info("Starting processing of models.")
 
         ts = self.config.execution_order
-        q = Queue()
+        # q = Queue()
         finalized_task_queue = Queue()
 
         with console.status("[bold green]Processing models...") as status:
@@ -97,7 +93,7 @@ class Runner:
 
                     self.logger.log_info(f"Processing model {name}...")
 
-                    q.put(model_dict)
+                    # q.put(model_dict)
                     output = f"Processing [bold blue]{name}[/]..."
                     console.log(output, log_locals=False)
 
@@ -117,7 +113,7 @@ class Runner:
                         continue
                     p = Process(
                         target=process_model,
-                        args=(q.get(), model_module, finalized_task_queue),
+                        args=(model_dict, model_module, finalized_task_queue),
                     )
                     procs.append(p)
                     p.start()
