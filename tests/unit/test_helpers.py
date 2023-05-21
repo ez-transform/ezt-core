@@ -43,7 +43,6 @@ def test_parse_yaml(project_yml):
 
 
 def test_get_model_dependencies(example_model):
-
     deps = get_model_dependencies(example_model)
     expected = {"ingest1", "ingest2"}
 
@@ -51,7 +50,6 @@ def test_get_model_dependencies(example_model):
 
 
 def test_get_model_dependencies_all(example_model):
-
     deps = get_model_dependencies(example_model)
     expected = {"ingest1", "ingest2"}
 
