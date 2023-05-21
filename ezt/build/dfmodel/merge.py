@@ -21,8 +21,8 @@ from ezt.util.exceptions import EztMergeException
 #         raise EztMergeException("Key in source model is not unique.")
 
 #     # sort source and target in same order
-#     source = source.sort(merge_col, reverse=False)
-#     target = target.sort(merge_col, reverse=False)
+#     source = source.sort(merge_col, descending=False)
+#     target = target.sort(merge_col, descending=False)
 
 #     # new rows to append
 #     append_mask = source[merge_col].is_in(target[merge_col])
@@ -59,7 +59,7 @@ from ezt.util.exceptions import EztMergeException
 #     # concat all results
 
 #     df_final = pl.concat([df_append, df_leave, df_update, df_not_update]).sort(
-#         merge_col, reverse=False
+#         merge_col, descending=False
 #     )
 
 #     final_check = df_final.filter(pl.col(merge_col).is_duplicated())
@@ -74,7 +74,6 @@ from ezt.util.exceptions import EztMergeException
 
 
 def calculate_merge(source, target, merge_col) -> pa.Table:
-
     # config.log_info("Calculating merge...")
 
     # preliminary checks
@@ -91,8 +90,8 @@ def calculate_merge(source, target, merge_col) -> pa.Table:
         raise EztMergeException("Key in target model is not unique.")
 
     # sort source and target in same order
-    source = source.sort(merge_col, reverse=False)
-    target = target.sort(merge_col, reverse=False)
+    source = source.sort(merge_col, descending=False)
+    target = target.sort(merge_col, descending=False)
 
     # new rows to append, i.e. rows in source but not in target
     df_append = (
@@ -128,7 +127,7 @@ def calculate_merge(source, target, merge_col) -> pa.Table:
         .select(pl.exclude("_update_rows"))
     )
 
-    df_final = pl.concat([df_append, df_leave, df_update]).sort(merge_col, reverse=False)
+    df_final = pl.concat([df_append, df_leave, df_update]).sort(merge_col, descending=False)
 
     final_check = df_final.filter(pl.col(merge_col).is_duplicated())
     if len(final_check) == 0:
