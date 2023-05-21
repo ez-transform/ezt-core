@@ -3,6 +3,7 @@ import os
 
 # from distutils.dir_util import copy_tree
 import shutil
+import sys
 
 from adlfs import AzureBlobFileSystem
 from s3fs import S3FileSystem
@@ -67,33 +68,53 @@ def parse_yaml(file: str) -> dict:
 def get_model_dependencies(model):
     """
     Same as get_model_dependencies_all except it skips sources.
+    Python 3.11 bytecode requires special handling.
     """
     deps = set()
     bytecode = dis.Bytecode(model)
     instrs = list(reversed([instr for instr in bytecode]))
-    for (ix, instr) in enumerate(instrs):
-        if instr.opname == "CALL_FUNCTION":
-            load_func_instr = instrs[ix + instr.arg + 1]
-            func = load_func_instr.argval
-            set_param_instr = instrs[ix + instr.arg]
-            param = set_param_instr.argval
-            if isinstance(func, str):
-                if func in "get_model":
-                    deps.add(param)
-        elif instr.opname == "CALL_FUNCTION_KW":
-            load_func_instr = instrs[ix + instr.arg + 2]
-            func = load_func_instr.argval
-            set_param_instr = instrs[ix + instr.arg + 1]
-            param = set_param_instr.argval
-            if isinstance(func, str):
-                if func in "get_model":
-                    deps.add(param)
+    for ix, instr in enumerate(instrs):
+        if sys.version_info.major == 3 and sys.version_info.minor == 11:
+            if instr.opname == "CALL" and instrs[ix + 2].opname != "KW_NAMES":
+                load_func_instr = instrs[ix + instr.arg + 2]
+                func = load_func_instr.argval
+                set_param_instr = instrs[ix + instr.arg + 1]
+                param = set_param_instr.argval
+                if isinstance(func, str):
+                    if func in "get_model":
+                        deps.add(param)
+
+            elif instr.opname == "CALL" and instrs[ix + 2].opname == "KW_NAMES":
+                load_func_instr = instrs[ix + instr.arg + 3]
+                func = load_func_instr.argval
+                set_param_instr = instrs[ix + instr.arg + 2]
+                param = set_param_instr.argval
+                if isinstance(func, str):
+                    if func in "get_model":
+                        deps.add(param)
+
+        elif sys.version_info.major == 3 and sys.version_info.minor < 11:
+            if instr.opname == "CALL_FUNCTION":
+                load_func_instr = instrs[ix + instr.arg + 1]
+                func = load_func_instr.argval
+                set_param_instr = instrs[ix + instr.arg]
+                param = set_param_instr.argval
+                if isinstance(func, str):
+                    if func in "get_model":
+                        deps.add(param)
+            elif instr.opname == "CALL_FUNCTION_KW":
+                load_func_instr = instrs[ix + instr.arg + 2]
+                func = load_func_instr.argval
+                set_param_instr = instrs[ix + instr.arg + 1]
+                param = set_param_instr.argval
+                if isinstance(func, str):
+                    if func in "get_model":
+                        deps.add(param)
 
     return deps
 
 
 def get_s3_filesystem() -> S3FileSystem:
-
     access_key = os.getenv("AWS_ACCESS_KEY_ID")
     secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 
@@ -101,7 +122,6 @@ def get_s3_filesystem() -> S3FileSystem:
 
 
 def get_adls_filesystem() -> AzureBlobFileSystem:
-
     if (
         os.getenv("AZURE_STORAGE_ACCOUNT_NAME") is None
         or os.getenv("AZURE_STORAGE_TENANT_ID") is None
@@ -127,7 +147,6 @@ def get_adls_filesystem() -> AzureBlobFileSystem:
 
 
 def prepare_s3_path(path):
-
     if path.startswith("s3://"):
         pass
     else:
@@ -142,7 +161,6 @@ def prepare_s3_path(path):
 
 
 def prepare_adls_path(path):
-
     if path.startswith("abfss://"):
         pass
     elif path.startswith("abfs://"):
@@ -161,7 +179,6 @@ def prepare_adls_path(path):
 
 
 def prepare_adls_path_pqdataset(path):
-
     if path.startswith("abfss://"):
         path = path[8:]
     elif path.startswith("abfs://"):
