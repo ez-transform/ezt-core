@@ -33,7 +33,6 @@ def get_source(name: str, project_base_dir: str = None) -> pl.LazyFrame:
 
 def _get_source_getter_func(source_dict):
     if source_dict["filesystem"] == "s3":
-
         if source_dict["format"] == "parquet":
             return _get_s3_parq_source
         elif source_dict["format"] == "delta":
@@ -42,14 +41,12 @@ def _get_source_getter_func(source_dict):
             return _get_s3_csv_source
 
     elif source_dict["filesystem"] == "local":
-
         if source_dict["format"] == "csv":
             return _get_csv_local_source
         elif source_dict["format"] == "parquet":
             return _get_parq_local_source
 
     elif source_dict["filesystem"] == "adls":
-
         if source_dict["format"] == "parquet":
             return _get_adls_parq_source
         elif source_dict["format"] == "delta":
@@ -81,7 +78,7 @@ def _get_s3_parq_source(source):
     if source["path_type"] == "folder":
         target_path = f"s3://{path}/"
         dset = ds.dataset(target_path, format="parquet")
-        table = pl.scan_ds(dset)
+        table = pl.scan_pyarrow_dataset(dset)
     elif source["path_type"] == "file":
         target_path = f"{path}"
         pa_table = pq.read_table(target_path, filesystem=s3)
@@ -137,7 +134,6 @@ def _get_s3_csv_source(source_dict):
     s3 = get_s3_filesystem()
 
     with s3.open(source_dict["path"]) as f:
-
         if "csv_properties" in source_dict:
             table = csv.read_csv(
                 input_file=f, parse_options=csv.ParseOptions(**source_dict["csv_properties"])
@@ -168,7 +164,7 @@ def _get_adls_parq_source(source_dict):
     if source_dict["path_type"] == "folder":
         target_path = f"abfss://{path}/"
         dset = ds.dataset(target_path, format="parquet")
-        table = pl.scan_ds(dset)
+        table = pl.scan_pyarrows_dataset(dset)
     elif source_dict["path_type"] == "file":
         target_path = f"{path}"
         pa_table = pq.read_table(target_path, filesystem=adls)
@@ -202,7 +198,6 @@ def _get_adls_csv_source(source_dict):
     adls = get_adls_filesystem()
 
     with adls.open(source_dict["path"]) as f:
-
         if "csv_properties" in source_dict:
             table = csv.read_csv(
                 input_file=f, parse_options=csv.ParseOptions(**source_dict["csv_properties"])

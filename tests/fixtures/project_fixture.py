@@ -30,7 +30,7 @@ def conf_fixture(tmp_path_factory):
                 "path": raw_customers_path,
                 "csv_properties": {
                     "has_header": True,
-                    "sep": ",",
+                    "separator": ",",
                 },
             }
         ]

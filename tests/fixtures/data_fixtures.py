@@ -11,7 +11,7 @@ import pytest
 @pytest.fixture
 def new_rows():
     file_path = os.path.dirname(os.path.realpath(__file__))
-    data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", sep=",", has_header=True)
+    data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", separator=",", has_header=True)
     source_data = data[75:]
     target_data = data[:75]
     return (source_data, target_data)
@@ -20,7 +20,7 @@ def new_rows():
 @pytest.fixture
 def overlapping_rows():
     file_path = os.path.dirname(os.path.realpath(__file__))
-    data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", sep=",", has_header=True)
+    data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", separator=",", has_header=True)
     source_data = data[:75]
     target_data = data[25:100]
     return (source_data, target_data)
@@ -29,7 +29,7 @@ def overlapping_rows():
 @pytest.fixture
 def data_update():
     file_path = os.path.dirname(os.path.realpath(__file__))
-    data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", sep=",", has_header=True)
+    data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", separator=",", has_header=True)
     source_data = data[:75].with_columns(
         pl.when(pl.col("id") == 10)
         .then("UPDATED_NAME")
@@ -43,7 +43,7 @@ def data_update():
 @pytest.fixture
 def sample_frame():
     file_path = os.path.dirname(os.path.realpath(__file__))
-    data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", sep=",", has_header=True)
+    data = pl.scan_csv(f"{file_path}/data/raw_customers.csv", separator=",", has_header=True)
     return data.collect()
 
 
@@ -111,7 +111,6 @@ def polars_dataframe(pyarrow_table):
 
 @pytest.fixture
 def delta_table_path(tmp_path, pyarrow_table):
-
     delta_path = tmp_path / "my_delta_model"
     delta_path.mkdir()
     path = delta_path.as_posix()
