@@ -5,16 +5,23 @@ import os
 from importlib.util import module_from_spec, spec_from_file_location
 from typing import Union
 
+from jinja2 import DictLoader, Environment
+
 # from matplotlib import pyplot as plt
 from yaml import parse
 
+from ezt.include import MACROS_PATH
 from ezt.util.exceptions import (
     ConfigInitException,
     EztConfigException,
     GetModelException,
     GetSourceException,
 )
-from ezt.util.helpers import get_model_dependencies, parse_yaml
+from ezt.util.helpers import (
+    get_model_dependencies,
+    get_sql_model_dependencies,
+    parse_yaml,
+)
 from ezt.util.validator import Validator
 
 
@@ -80,6 +87,12 @@ class Config:
             models = parse_yaml(models_path)
             return models
 
+    # @property
+    # def environment(self) -> Environment:
+    #     with open(macros, "r") as e:
+    #     sql = f.read()
+    #     macro = e.read()
+
     def get_model(self, model_name) -> dict:
         """Returns a specific model configuration by name."""
 
@@ -105,14 +118,18 @@ class Config:
 
         for model in self.models["models"]:
             # import model
-            df_model = self.import_model(model["name"])
-            # file = f'{self.project_dir}/{self.project["models_folder"]}/{model["name"]}.py'
-            # spec = importlib.util.spec_from_file_location(f"local_project.{model['name']}", file)
-            # models = importlib.util.module_from_spec(spec)
-            # spec.loader.exec_module(models)
 
-            model_deps = get_model_dependencies(unwrap(df_model.df_model))
-            deps[model["name"]] = model_deps
+            if model["type"] == "df":
+                df_model = self.import_model(model["name"])
+                model_deps = get_model_dependencies(unwrap(df_model.df_model))
+                deps[model["name"]] = model_deps
+
+            elif model["type"] == "sql":
+                sql_template = f"{self.project_dir}/{self.project['models']['main_folder']}/{model['group']}/{model['name']}.sql"
+                with open(sql_template, "r") as f:
+                    sql = f.read()
+
+                deps[model["name"]] = get_sql_model_dependencies
 
         ts = gl.TopologicalSorter(deps)
         return ts

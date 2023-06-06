@@ -1,5 +1,6 @@
 import dis
 import os
+import re
 
 # from distutils.dir_util import copy_tree
 import shutil
@@ -144,6 +145,19 @@ def get_adls_filesystem() -> AzureBlobFileSystem:
         client_id=client_id,
         client_secret=client_secret,
     )
+
+
+def get_sql_model_dependencies(sql_template: str) -> tuple:
+    parameters = ()
+    pattern = r"\{\{\s*model\((.*?)\)\s*\}\}"
+
+    matches = re.findall(pattern, sql_template, re.MULTILINE | re.DOTALL)
+
+    for match in matches:
+        params = match.strip()
+        parameters += (params,)
+
+    return parameters
 
 
 def prepare_s3_path(path):

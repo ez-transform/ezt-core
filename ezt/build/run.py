@@ -51,7 +51,6 @@ class Runner:
             while ts.is_active():
                 procs = []
                 for name in ts.get_ready():
-
                     model_dict = self.config.get_model(name)
                     # check if model_name or model_group argument was passed and only process that model/group
                     if model_name:
@@ -98,25 +97,29 @@ class Runner:
                     console.log(output, log_locals=False)
 
                     # TODO: likely requires different logic for sql models
-                    try:
-                        model_module = self.config.import_model(name)
-                    except Exception:
-                        tb = traceback.format_exc()
-                        finalized_task_queue.put(
-                            {
-                                "model_name": name,
-                                "status": "failed",
-                                "duration": "0.00",
-                                "traceback": tb,
-                            }
+                    if model_dict["type"] == "df":
+                        try:
+                            model_module = self.config.import_model(name)
+                        except Exception:
+                            tb = traceback.format_exc()
+                            finalized_task_queue.put(
+                                {
+                                    "model_name": name,
+                                    "status": "failed",
+                                    "duration": "0.00",
+                                    "traceback": tb,
+                                }
+                            )
+                            continue
+                        p = Process(
+                            target=process_model,
+                            args=(q.get(), model_module, finalized_task_queue),
                         )
-                        continue
-                    p = Process(
-                        target=process_model,
-                        args=(q.get(), model_module, finalized_task_queue),
-                    )
-                    procs.append(p)
-                    p.start()
+                        procs.append(p)
+                        p.start()
+                    elif model_dict["type"] == "sql":
+                        sql = render_sql(model_dict)
+                        result = execute_sql(sql)
 
                 for p in procs:
                     p.join()
