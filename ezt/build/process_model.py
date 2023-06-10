@@ -3,10 +3,13 @@ import time
 import traceback
 from multiprocessing import Queue
 from types import ModuleType
+from typing import Union
+from ezt.build.sqlmodel.base import execute_sql, render_sql
 
 import polars as pl
 import pyarrow.parquet as pq
 from ezt.build.dfmodel.merge import calculate_merge
+from ezt.util.helpers import get_sql_model_dependencies_all
 
 # from ezt.build.dfmodel.register_df_sources import get_sources
 from ezt.build.dfmodel.persist_delta import create_delta_table
@@ -22,12 +25,12 @@ from ezt.util.helpers import (
 
 def process_model(
     model_dict: dict,
-    ezt_module: ModuleType,
+    model: Union[ModuleType, tuple],
     finalized_task_queue: Queue,
 ):
     """
     Function that is responsible for processing a model and storing the resulting
-    dataframe to disk. The processing results get put into finalized_task_queue.
+    dataframe to local disk or remote storage. The processing results get put into finalized_task_queue.
     The result put into finalized_task_queue should be a dictionary with the keys model_name
     and status.
     """
@@ -49,7 +52,7 @@ def process_model(
         return
 
     try:
-        processor(model_dict, ezt_module)
+        processor(model_dict, model)
         finalized_task_queue.put(
             {
                 "model_name": model_dict["name"],
@@ -75,7 +78,14 @@ def _get_processor(model_dict):
     """Function that determines how your model should be processed."""
     if model_dict["type"] == "sql":
         # TODO
-        raise NotImplementedError("SQL models are not supported yet.")
+        if (
+            model_dict['write_settings']['file_type'] == 'parquet'
+            and model_dict['filesystem'] == 'local'
+        ):
+            return _sql_local_parquet
+        else:
+            raise NotImplementedError("Local parquet files are only currently supported for sql models.")
+
 
     elif model_dict["type"] == "df":
         if (
@@ -284,3 +294,18 @@ def _create_delta_storage_options(model_dict):
         )
 
     return storage_options
+
+def _sql_local_parquet(model_dict: dict, input: tuple) -> None:
+
+    sql = input[0]
+    deps = input[1]
+
+    prepare_local(model_dict["destination"])
+    
+    df = execute_sql(sql, deps).collect()
+
+    df.write_parquet(
+        file=f'{model_dict["destination"]}/{model_dict["name"]}.parquet',
+        compression="snappy",
+    )
+    return
