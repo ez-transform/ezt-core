@@ -57,7 +57,7 @@ class Config:
             return sources
 
     @property
-    def models(self):
+    def models(self) -> dict:
         """Returns the models.yml as a python dict."""
 
         if "groups" in self.project["models"]:
@@ -100,7 +100,7 @@ class Config:
             if m["name"] == model_name:
                 return m
         else:
-            raise GetModelException()
+            raise GetModelException(f"Model {model_name} not found.")
 
     def get_source(self, source_name) -> dict:
         """Returns a specific source configuration by name."""
@@ -109,7 +109,7 @@ class Config:
             if s["name"] == source_name:
                 return s
         else:
-            raise GetSourceException()
+            raise GetSourceException(f"Source \"{source_name}\" not found.")
 
     @property
     def execution_order(self) -> gl.TopologicalSorter:
@@ -117,7 +117,6 @@ class Config:
         deps = {}
 
         for model in self.models["models"]:
-            # import model
 
             if model["type"] == "df":
                 df_model = self.import_model(model["name"])
@@ -125,11 +124,14 @@ class Config:
                 deps[model["name"]] = model_deps
 
             elif model["type"] == "sql":
-                sql_template = f"{self.project_dir}/{self.project['models']['main_folder']}/{model['group']}/{model['name']}.sql"
+                if "group" in model.keys():
+                    sql_template = f"{self.project_dir}/{self.project['models']['main_folder']}/{model['group']}/{model['name']}.sql"
+                else:
+                    sql_template = f"{self.project_dir}/{self.project['models']['main_folder']}/{model['name']}.sql"
                 with open(sql_template, "r") as f:
                     sql = f.read()
 
-                deps[model["name"]] = get_sql_model_dependencies
+                deps[model["name"]] = get_sql_model_dependencies(sql)
 
         ts = gl.TopologicalSorter(deps)
         return ts
@@ -178,3 +180,21 @@ class Config:
         df_model = module_from_spec(spec)
         spec.loader.exec_module(df_model)
         return df_model
+    
+    def get_sql(self, model_name: str) -> str:
+        """Function that returns a models sql code as a string"""
+
+        model_dict = self.get_model(model_name)
+
+        if model_dict['type'] == 'sql':
+            if 'group' in model_dict.keys():
+                sql_file = f"{self.project_dir}/{self.project['models']['main_folder']}/{model_dict['group']}/{model_name}.sql"
+            else:
+                sql_file = f"{self.project_dir}/{self.project['models']['main_folder']}/{model_name}.sql"
+            
+            with open(sql_file, 'r') as f:
+                sql = f.read()
+        else:
+            raise EztConfigException('Something went wrong. Method called for a non-sql model.')
+
+        return sql        

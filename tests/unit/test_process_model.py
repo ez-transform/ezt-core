@@ -1,4 +1,5 @@
-from multiprocessing import Process, Queue
+# from multiprocessing import Process, Queue
+from queue import Queue
 from types import FunctionType
 
 import pyexpat
@@ -49,10 +50,18 @@ def test_process_model_local_parq(mocker, model_dict_local_parq):
 #         process_model(invalid_model_dict, mock_module, finalized_task_queue)
 
 
-def test_get_processor_sql(sql_model):
+def test_get_processor_s3_sql(sql_s3_model):
 
     with pytest.raises(NotImplementedError):
-        _get_processor(sql_model)
+        _get_processor(sql_s3_model)
+
+def test_get_processor_local_sql(sql_local_model):
+
+    processor = _get_processor(sql_local_model)
+
+    assert isinstance(processor, FunctionType)
+    assert processor.__name__ == '_sql_local_parquet'
+
 
 
 def test_get_processor_df_local_delta(model_dict_local_delta_overwrite):

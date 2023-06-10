@@ -8,6 +8,8 @@ from ezt.util.logger import EztLogger
 from ezt.util.result import ExecutionResult, ModelResult
 from rich.console import Console
 from sys import platform
+from ezt.util.helpers import get_sql_model_dependencies, get_sql_model_dependencies_all
+from ezt.build.sqlmodel.base import render_sql, execute_sql
 
 
 class Runner:
@@ -51,6 +53,10 @@ class Runner:
             while ts.is_active():
                 procs = []
                 for name in ts.get_ready():
+                    if name not in [m['name'] for m in self.config.models['models']]:
+                        ts.done(name)
+                        continue
+
                     model_dict = self.config.get_model(name)
                     # check if model_name or model_group argument was passed and only process that model/group
                     if model_name:
@@ -118,8 +124,15 @@ class Runner:
                         procs.append(p)
                         p.start()
                     elif model_dict["type"] == "sql":
-                        sql = render_sql(model_dict)
-                        result = execute_sql(sql)
+                        raw_sql = self.config.get_sql(name)
+                        deps = get_sql_model_dependencies_all(raw_sql)
+                        rendered_sql = render_sql(raw_sql, self.config.sources['sources'], self.config.models['models'])
+                        p = Process(
+                            target=process_model,
+                            args=(q.get(), (rendered_sql, deps), finalized_task_queue)
+                        )
+                        procs.append(p)
+                        p.start()
 
                 for p in procs:
                     p.join()
