@@ -1,5 +1,6 @@
 import dis
 import os
+import re
 
 # from distutils.dir_util import copy_tree
 import shutil
@@ -144,6 +145,39 @@ def get_adls_filesystem() -> AzureBlobFileSystem:
         client_id=client_id,
         client_secret=client_secret,
     )
+
+
+def get_sql_model_dependencies(sql_template: str) -> list:
+    deps = set()
+    pattern = r"\{\{\s*model\((.*?)\)\s*\}\}"
+
+    matches = re.findall(pattern, sql_template, re.MULTILINE | re.DOTALL)
+
+    for match in matches:
+        param = match.strip()
+        deps.add(param)
+
+    return deps
+
+def get_sql_model_dependencies_all(sql_template: str) -> dict:
+    """Function that returns all dependencies including sources for a sql model."""
+    deps = {"models": set(), 'sources': set()}
+    model_pattern = r"\{\{\s*model\((.*?)\)\s*\}\}"
+    source_pattern = r"\{\{\s*source\((.*?)\)\s*\}\}"
+
+    model_matches = re.findall(model_pattern, sql_template, re.MULTILINE | re.DOTALL)
+    source_matches = re.findall(source_pattern, sql_template, re.MULTILINE | re.DOTALL)
+
+    for match in model_matches:
+        mod_param = match.strip().strip("'")
+        deps['models'].add(mod_param)
+
+    for match in source_matches:
+        src_param = match.strip().strip("'")
+        deps['sources'].add(src_param)
+
+    return deps
+
 
 
 def prepare_s3_path(path):

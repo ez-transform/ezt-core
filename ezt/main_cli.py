@@ -90,7 +90,12 @@ def order(config):
     help="Provide the name of a specific model group to run all models in that group and skip the rest.",
     default=None,
 )
-def run(config, validate, model_name, model_group):
+@click.option(
+    "--debug",
+    help='In case of error, the traceback output shows local variables as well.',
+    is_flag=True
+)
+def run(config, validate, model_name, model_group, debug=False):
     """
     Runs the models you have created.
     """
@@ -116,4 +121,7 @@ def run(config, validate, model_name, model_group):
         result = runner.Execute(model_name, model_group)
         result.print_result()
     except Exception:
-        console.print_exception()
+        if debug:
+            console.print_exception(show_locals=True)
+        else:
+            console.print_exception()

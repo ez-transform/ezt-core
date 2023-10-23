@@ -228,13 +228,31 @@ def invalid_model_dict():
 
 
 @pytest.fixture
-def sql_model():
+def sql_local_model():
 
     model_dict = {
         "name": "my_name",
         "type": "sql",
         "filesystem": "local",
         "destination": "my_folder",
+        "write_settings": {
+            'file_type': 'parquet'
+        }
+             
+    }
+    return model_dict
+
+@pytest.fixture
+def sql_s3_model():
+
+    model_dict = {
+        "name": "my_name",
+        "type": "sql",
+        "filesystem": "s3",
+        "destination": "my_folder",
+        "write_settings": {
+            'file_type': 'parquet'
+        }
     }
     return model_dict
 
