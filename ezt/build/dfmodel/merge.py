@@ -96,7 +96,9 @@ def calculate_merge(source, target, merge_col) -> pa.Table:
     # new rows to append, i.e. rows in source but not in target
     df_append = (
         source.with_columns(
-            source[merge_col].is_in(target[merge_col]).apply(lambda x: not x).alias("_append_rows")
+            ~source[merge_col].is_in(target[merge_col])
+            # .apply(lambda x: not x)
+            .alias("_append_rows")
         )
         .filter(pl.col("_append_rows") == True)
         .select(pl.exclude("_append_rows"))
@@ -105,7 +107,9 @@ def calculate_merge(source, target, merge_col) -> pa.Table:
     # existing rows to leave, i.e. rows in target but not in source
     df_leave = (
         target.with_columns(
-            target[merge_col].is_in(source[merge_col]).apply(lambda x: not x).alias("_leave_rows")
+            ~target[merge_col]
+            .is_in(source[merge_col])  # .apply(lambda x: not x)
+            .alias("_leave_rows")
         )
         .filter(pl.col("_leave_rows") == True)
         .select(pl.exclude("_leave_rows"))
@@ -118,9 +122,8 @@ def calculate_merge(source, target, merge_col) -> pa.Table:
     # get rows from source that will replace existing rows in target, i.e. rows in source that should not be appended to target
     df_update = (
         source.with_columns(
-            source[merge_col]
-            .is_in(df_append[merge_col])
-            .apply(lambda x: not x)
+            ~source[merge_col].is_in(df_append[merge_col])
+            # .apply(lambda x: not x)
             .alias("_update_rows")
         )
         .filter(pl.col("_update_rows") == True)
