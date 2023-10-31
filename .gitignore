@@ -170,3 +170,6 @@ credentials.sh
 
 # markdownlint file
 .markdownlint.json
+
+# pyright settings for venv
+pyrightconfig.json
